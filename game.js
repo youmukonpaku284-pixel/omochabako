@@ -12,3 +12,5 @@ target.addEventListener("pointerdown",e=>{e.stopPropagation();if(!active)return;
 field.addEventListener("pointerdown",e=>{if(started&&e.target!==target){misses++;update();}});
 $("start").addEventListener("click",begin);$("retry").addEventListener("click",begin);
 update();
+// Prototype entry point: replace with an actual ranking/puzzle mechanism later.
+$("nameForm").addEventListener("submit",event=>{event.preventDefault();const name=$("playerName").value.trim();if(!name)return;if(name.toUpperCase()==="TEST"){window.location.href="secret/";return;}$("nameStatus").textContent="登録ありがとう！ ランキングの公開機能は準備中だよ ♡";});
