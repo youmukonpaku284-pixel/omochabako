@@ -83,11 +83,45 @@ function acceptEleventh(){
    el.textContent=line;
    log.appendChild(el);
  },(i+1)*900));
+ setTimeout(()=>{if(token===session)openRemoteConsole(token);},5100);
 }
 const oldBegin=begin;
 begin=function(){
  stopEleventh();
  document.body.classList.remove("site-breached");
+ document.getElementById("remoteConsole")?.remove();
  field.classList.remove("corrupted");
  oldBegin();
 };
+
+function openRemoteConsole(token){
+ if(token!==session)return;
+ const screen=document.createElement("section");
+ screen.id="remoteConsole";
+ screen.className="remote-console";
+ screen.setAttribute("aria-label","接続されたコンソール");
+ screen.innerHTML='<div class="remote-top"><span>REMOTE CONSOLE</span><span class="remote-indicator">● CONNECTED</span></div><pre class="remote-logs" id="remoteLogs"></pre><div class="remote-center"><span id="remoteGreeting"></span><span class="remote-cursor" aria-hidden="true">▌</span></div><div class="remote-bottom">SESSION ESTABLISHED <span>_</span></div>';
+ document.body.appendChild(screen);
+ requestAnimationFrame(()=>screen.classList.add("visible"));
+ const log=document.getElementById("remoteLogs");
+ const lines=[
+  "> initializing terminal...",
+  "> searching for remote host...",
+  "> host found",
+  "> opening session...",
+  "> handshake accepted",
+  "> connection established"
+ ];
+ lines.forEach((line,i)=>setTimeout(()=>{
+  if(token!==session||!screen.isConnected)return;
+  log.textContent+=line+"\n";
+ },500+i*260));
+ const greeting="こんにちは";
+ let pos=0;
+ const type=()=>{
+  if(token!==session||!screen.isConnected)return;
+  document.getElementById("remoteGreeting").textContent=greeting.slice(0,++pos);
+  if(pos<greeting.length)setTimeout(type,250);
+ };
+ setTimeout(type,3300);
+}
