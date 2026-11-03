@@ -21,3 +21,11 @@
 @keyframes lcd-flicker{0%{filter:brightness(.2)}20%{filter:brightness(1.4)}38%{filter:brightness(.65)}60%{filter:brightness(1.2)}100%{filter:brightness(1)}}
 @keyframes lcd-text-in{0%{opacity:0;filter:blur(4px)}100%{opacity:1;filter:none}}
 @media(prefers-reduced-motion:reduce){.remote-console.remote-booting .remote-boot,.remote-boot-text.revealed{animation:none}}
+
+/* Directory view stays in the same green-on-black terminal palette. */
+.remote-directory{position:absolute;inset:0;padding:max(32px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom));overflow:auto;background:#020403;color:#8cd6a6;font:clamp(12px,3vw,16px)/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
+.remote-directory[hidden]{display:none}
+.remote-directory-heading,.remote-directory-prompt{font:inherit;white-space:pre-wrap;margin:0}
+.remote-directory-entry{display:block;width:max-content;max-width:100%;padding:3px 0;color:inherit;text-decoration:none;cursor:pointer}
+a.remote-directory-entry:hover,a.remote-directory-entry:focus-visible{color:#d4ffe0;text-decoration:underline}
+.remote-locked{opacity:.55;cursor:default}
