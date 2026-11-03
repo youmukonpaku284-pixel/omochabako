@@ -100,7 +100,7 @@ function openRemoteConsole(token){
  screen.id="remoteConsole";
  screen.className="remote-console";
  screen.setAttribute("aria-label","接続されたコンソール");
- screen.innerHTML='<pre class="remote-logs" id="remoteLogs"></pre><div class="remote-boot" id="remoteBoot" aria-hidden="true"><div class="remote-boot-text" id="remoteGreeting"></div></div>';
+ screen.innerHTML='<pre class="remote-logs" id="remoteLogs"></pre><div class="remote-directory" id="remoteDirectory" hidden></div>';
  document.body.appendChild(screen);
  requestAnimationFrame(()=>screen.classList.add("visible"));
  const log=document.getElementById("remoteLogs");
@@ -111,7 +111,7 @@ function openRemoteConsole(token){
  const burst=setInterval(()=>{
   if(token!==session||!screen.isConnected){clearInterval(burst);return;}
   let chunk="";
-  for(let i=0;i<18;i++){
+  for(let i=0;i<8;i++){
    const verb=verbs[Math.floor(Math.random()*verbs.length)];
    const path=paths[Math.floor(Math.random()*paths.length)];
    chunk+="["+String(++lineNumber).padStart(5,"0")+"] $ "+verb+" "+path+" --id=0x"+randomHex()+"  "+(Math.random()>.17?"OK":"PENDING")+"\n";
@@ -119,22 +119,42 @@ function openRemoteConsole(token){
   log.textContent+=chunk;
   if(log.textContent.length>18000)log.textContent=log.textContent.slice(-13000);
   log.scrollTop=log.scrollHeight;
- },42);
+ },85);
  setTimeout(()=>{
   if(token!==session||!screen.isConnected)return;
   clearInterval(burst);
   screen.classList.add("remote-cut");
   setTimeout(()=>{
    if(token!==session||!screen.isConnected)return;
-   screen.classList.add("remote-booting");
-   const boot=document.getElementById("remoteBoot");
-   boot.setAttribute("aria-hidden","false");
-   const greeting=document.getElementById("remoteGreeting");
+   const directory=document.getElementById("remoteDirectory");
+   directory.hidden=false;
+   screen.classList.add("remote-directory-open");
+   const heading=document.createElement("pre");
+   heading.className="remote-directory-heading";
+   heading.textContent="REMOTE SESSION ESTABLISHED\n\nC:\\\\OM OCHABAKO\\\\ARCHIVE> DIR\n\n Directory of ARCHIVE\n";
+   directory.appendChild(heading);
+   const entries=[
+    ["01  INDEX.HTML","secret/"],
+    ["02  DIARY.LOG","secret/01.html"],
+    ["03  SYSTEM.DAT",null],
+    ["04  BACKUP","secret/04.html"],
+    ["05  [ACCESS DENIED]",null]
+   ];
+   entries.forEach(([label,href],i)=>setTimeout(()=>{
+    if(token!==session||!screen.isConnected)return;
+    const row=document.createElement(href?"a":"span");
+    row.className="remote-directory-entry"+(href?"":" remote-locked");
+    row.textContent=label;
+    if(href)row.href=href;
+    directory.appendChild(row);
+   },i*220));
    setTimeout(()=>{
     if(token!==session||!screen.isConnected)return;
-    greeting.textContent="こんにちは";
-    greeting.classList.add("revealed");
-   },1250);
+    const prompt=document.createElement("pre");
+    prompt.className="remote-directory-prompt";
+    prompt.textContent="\n5 entries found.\n\nC:\\\\ARCHIVE> _";
+    directory.appendChild(prompt);
+   },1400);
   },450);
  },4300);
 }
