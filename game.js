@@ -22,15 +22,72 @@ update();
 // Prototype entry point: replace with an actual ranking/puzzle mechanism later.
 $("nameForm").addEventListener("submit",event=>{event.preventDefault();const name=$("playerName").value.trim();if(!name)return;if(name.toUpperCase()==="TEST"){window.location.href="secret/";return;}$("nameStatus").textContent="登録ありがとう！ ランキングの公開機能は準備中だよ ♡";});
 
+let eleventhWindow=false,eleventhTimer=null,eleventhLogTimer=null;
+const bear=$("eleventhToy");
+function stopEleventh(){
+ eleventhWindow=false;
+ clearTimeout(eleventhTimer);
+ clearTimeout(eleventhLogTimer);
+ bear.tabIndex=-1;
+}
 function triggerSecret(){
- started=false;active=false;target.hidden=true;result.hidden=true;message.hidden=false;message.style.display="flex";
+ started=false;active=false;target.hidden=true;result.hidden=true;
+ message.hidden=false;message.style.display="flex";
  field.classList.add("corrupted");
- message.innerHTML='<span class="terminal-title">10 / 10 COMPLETE</span><div class="terminal-log" id="terminalLog" role="status" aria-live="polite">照合中...</div>';
+ message.innerHTML='<span class="terminal-title">10 / 10 COMPLETE</span><div class="terminal-log" id="terminalLog" role="status" aria-live="polite"></div>';
+ const token=session;
  const log=$("terminalLog");
- const steps=["認証パターンが一致しました。","11 / 10","次のおもちゃを準備しています。","ERROR: TARGET NOT FOUND","観測者を確認しました。","あなたは、どうしてその操作を知っているのですか？"];
- const token=session;let index=0;
- const next=()=>{if(token!==session||index>=steps.length)return;const line=document.createElement("div");line.textContent=steps[index++];log.appendChild(line);setTimeout(next,index===2?1100:850);};
- setTimeout(next,1200);
+ // The 4-second window starts when 11 / 10 becomes visible.
+ eleventhLogTimer=setTimeout(()=>{
+   if(token!==session)return;
+   const line=document.createElement("div");
+   line.textContent="11 / 10";
+   log.appendChild(line);
+   eleventhWindow=true;
+   bear.tabIndex=0;
+   eleventhTimer=setTimeout(()=>{
+     if(token!==session||!eleventhWindow)return;
+     stopEleventh();
+     const error=document.createElement("div");
+     error.textContent="ERROR: TARGET NOT FOUND";
+     log.appendChild(error);
+     setTimeout(()=>{
+       if(token!==session)return;
+       field.classList.remove("corrupted");
+       secretPossible=false;
+       finish();
+     },1100);
+   },4000);
+ },950);
+}
+bear.addEventListener("pointerdown",event=>{
+ if(!eleventhWindow)return;
+ event.preventDefault();
+ acceptEleventh();
+});
+bear.addEventListener("click",event=>{
+ if(!eleventhWindow||event.detail!==0)return;
+ acceptEleventh();
+});
+function acceptEleventh(){
+ if(!eleventhWindow)return;
+ stopEleventh();
+ document.body.classList.add("site-breached");
+ message.innerHTML='<span class="terminal-title">TARGET FOUND</span><div class="terminal-log" id="terminalLog" role="status" aria-live="polite"></div>';
+ const log=$("terminalLog");
+ const lines=["11 / 11","管理領域の整合性を確認中...","外部入力を検出しました。","接続を維持しています。"];
+ const token=session;
+ lines.forEach((line,i)=>setTimeout(()=>{
+   if(token!==session)return;
+   const el=document.createElement("div");
+   el.textContent=line;
+   log.appendChild(el);
+ },(i+1)*900));
 }
 const oldBegin=begin;
-begin=function(){field.classList.remove("corrupted");oldBegin();};
+begin=function(){
+ stopEleventh();
+ document.body.classList.remove("site-breached");
+ field.classList.remove("corrupted");
+ oldBegin();
+};
