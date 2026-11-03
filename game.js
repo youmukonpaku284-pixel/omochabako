@@ -100,28 +100,41 @@ function openRemoteConsole(token){
  screen.id="remoteConsole";
  screen.className="remote-console";
  screen.setAttribute("aria-label","接続されたコンソール");
- screen.innerHTML='<div class="remote-top"><span>REMOTE CONSOLE</span><span class="remote-indicator">● CONNECTED</span></div><pre class="remote-logs" id="remoteLogs"></pre><div class="remote-center"><span id="remoteGreeting"></span><span class="remote-cursor" aria-hidden="true">▌</span></div><div class="remote-bottom">SESSION ESTABLISHED <span>_</span></div>';
+ screen.innerHTML='<pre class="remote-logs" id="remoteLogs"></pre><div class="remote-boot" id="remoteBoot" aria-hidden="true"><div class="remote-boot-text" id="remoteGreeting"></div></div>';
  document.body.appendChild(screen);
  requestAnimationFrame(()=>screen.classList.add("visible"));
  const log=document.getElementById("remoteLogs");
- const lines=[
-  "> initializing terminal...",
-  "> searching for remote host...",
-  "> host found",
-  "> opening session...",
-  "> handshake accepted",
-  "> connection established"
- ];
- lines.forEach((line,i)=>setTimeout(()=>{
+ const verbs=["init","exec","mount","read","write","verify","scan","bind","resolve","connect","sync","load","decode","handshake","route","open"];
+ const paths=["/sys/core","/dev/tty0","/proc/session","/var/remote","/mnt/bridge","/usr/local/bin","/net/relay","/etc/runtime"];
+ const randomHex=()=>Math.floor(Math.random()*0xffffffff).toString(16).padStart(8,"0");
+ let lineNumber=0;
+ const burst=setInterval(()=>{
+  if(token!==session||!screen.isConnected){clearInterval(burst);return;}
+  let chunk="";
+  for(let i=0;i<18;i++){
+   const verb=verbs[Math.floor(Math.random()*verbs.length)];
+   const path=paths[Math.floor(Math.random()*paths.length)];
+   chunk+="["+String(++lineNumber).padStart(5,"0")+"] $ "+verb+" "+path+" --id=0x"+randomHex()+"  "+(Math.random()>.17?"OK":"PENDING")+"\n";
+  }
+  log.textContent+=chunk;
+  if(log.textContent.length>18000)log.textContent=log.textContent.slice(-13000);
+  log.scrollTop=log.scrollHeight;
+ },42);
+ setTimeout(()=>{
   if(token!==session||!screen.isConnected)return;
-  log.textContent+=line+"\n";
- },500+i*260));
- const greeting="こんにちは";
- let pos=0;
- const type=()=>{
-  if(token!==session||!screen.isConnected)return;
-  document.getElementById("remoteGreeting").textContent=greeting.slice(0,++pos);
-  if(pos<greeting.length)setTimeout(type,250);
- };
- setTimeout(type,3300);
+  clearInterval(burst);
+  screen.classList.add("remote-cut");
+  setTimeout(()=>{
+   if(token!==session||!screen.isConnected)return;
+   screen.classList.add("remote-booting");
+   const boot=document.getElementById("remoteBoot");
+   boot.setAttribute("aria-hidden","false");
+   const greeting=document.getElementById("remoteGreeting");
+   setTimeout(()=>{
+    if(token!==session||!screen.isConnected)return;
+    greeting.textContent="こんにちは";
+    greeting.classList.add("revealed");
+   },1250);
+  },450);
+ },4300);
 }
