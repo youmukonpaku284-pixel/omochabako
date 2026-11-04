@@ -64,7 +64,9 @@ function showRemoteDirectory(){
    const key=(cwd==="C:\\"?cwd:cwd+"\\")+arg;
    print(documents[key]||"FILE NOT FOUND / ファイルが見つかりません。");return;
   }
-  if(cmd==="STATUS"){print("SESSION: ACTIVE / セッション：稼働中\nACCESS: LIMITED / 権限：制限あり\nINTERFACE: LOCAL / 接続：ローカル");return;}
+  if(cmd==="STATUS"){let patched=false;try{patched=localStorage.getItem("omochabako_patch_v1")==="1";}catch{}print("SESSION: ACTIVE / セッション：稼働中\nACCESS: LIMITED / 権限：制限あり\nINTERFACE: LOCAL / 接続：ローカル\nPATCH: "+(patched?"APPLIED / 適用済み":"NONE / 未適用"));return;}
+  if(cmd==="PATCH"){try{localStorage.setItem("omochabako_patch_v1","1");}catch{}print("PATCH APPLIED / 変更を適用しました。\nRESTART REQUIRED / 反映には再起動が必要です。");return;}
+  if(cmd==="RESET"&&arg==="PATCH"){try{localStorage.removeItem("omochabako_patch_v1");}catch{}print("PATCH RESET / 変更を解除しました。\nRESTART REQUIRED / 反映には再起動が必要です。");return;}
   if(cmd==="RESTART"){window.location.href="../";return;}
   if(cmd==="CONNECT"){
    if(!arg){print("USAGE: CONNECT [DESTINATION] / 接続先を指定してください。");return;}
