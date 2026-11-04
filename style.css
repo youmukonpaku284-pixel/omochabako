@@ -42,4 +42,4 @@ a.remote-directory-entry:hover,a.remote-directory-entry:focus-visible{color:#d4f
 /* An unregistered object introduced by the fictional PATCH command. */
 .target.anomaly-toy{background:#121418!important;color:#020403!important;border:2px solid #444b53!important;box-shadow:0 0 0 2px #121418,0 0 18px #1d1828!important;font-size:46px!important;text-shadow:0 0 2px #444b53;filter:none!important}
 .pop.anomaly-pop{color:#30333d!important;font-family:ui-monospace,Consolas,monospace;font-size:12px!important;font-weight:bold;white-space:nowrap}
-.anomaly-result{display:inline-block;margin-top:12px;color:#66606c;font-family:ui-monospace,Consolas,monospace;letter-spacing:.02em}
+.anomaly-result{display:block;box-sizing:border-box;width:min(100%,420px);margin:16px auto 2px;padding:15px 12px;background:#020403;color:#8cd6a6;border:1px solid #254733;border-radius:3px;box-shadow:0 0 12px #78dba31a,inset 0 0 16px #102a1b66;text-align:left;font:clamp(13px,3.2vw,16px)/1.8 ui-monospace,SFMono-Regular,Consolas,"Hiragino Kaku Gothic ProN",monospace;letter-spacing:.015em;overflow-wrap:anywhere;white-space:normal;text-shadow:0 0 5px #78dba344}
