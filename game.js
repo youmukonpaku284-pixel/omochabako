@@ -24,11 +24,16 @@ $("nameForm").addEventListener("submit",event=>{event.preventDefault();const nam
 
 let eleventhWindow=false,eleventhTimer=null,eleventhLogTimer=null;
 const bear=$("eleventhToy");
+const TERMINAL_UNLOCK_KEY="omochabako_terminal_discovered_v1";
+const terminalUnlocked=()=>{try{return localStorage.getItem(TERMINAL_UNLOCK_KEY)==="1";}catch{return false;}};
+function saveTerminalUnlock(){try{localStorage.setItem(TERMINAL_UNLOCK_KEY,"1");}catch{}}
+function updateBearAccess(){bear.tabIndex=(eleventhWindow||terminalUnlocked())?0:-1;bear.style.cursor=terminalUnlocked()?"pointer":"default";}
+updateBearAccess();
 function stopEleventh(){
  eleventhWindow=false;
  clearTimeout(eleventhTimer);
  clearTimeout(eleventhLogTimer);
- bear.tabIndex=-1;
+ updateBearAccess();
 }
 function triggerSecret(){
  started=false;active=false;target.hidden=true;result.hidden=true;
@@ -44,7 +49,7 @@ function triggerSecret(){
    line.textContent="11 / 10";
    log.appendChild(line);
    eleventhWindow=true;
-   bear.tabIndex=0;
+   updateBearAccess();
    eleventhTimer=setTimeout(()=>{
      if(token!==session||!eleventhWindow)return;
      stopEleventh();
@@ -60,15 +65,17 @@ function triggerSecret(){
    },4000);
  },950);
 }
-bear.addEventListener("pointerdown",event=>{
- if(!eleventhWindow)return;
+function handleBearAccess(event){
+ if(!eleventhWindow&&!terminalUnlocked())return;
  event.preventDefault();
- acceptEleventh();
-});
-bear.addEventListener("click",event=>{
- if(!eleventhWindow||event.detail!==0)return;
- acceptEleventh();
-});
+ if(eleventhWindow){acceptEleventh();return;}
+ if(document.getElementById("remoteConsole"))return;
+ session++;
+ started=false;active=false;target.hidden=true;
+ openRemoteConsole(session,true);
+}
+bear.addEventListener("pointerdown",handleBearAccess);
+bear.addEventListener("click",event=>{if(event.detail===0)handleBearAccess(event);});
 function acceptEleventh(){
  if(!eleventhWindow)return;
  stopEleventh();
@@ -94,8 +101,10 @@ begin=function(){
  oldBegin();
 };
 
-function openRemoteConsole(token){
+function openRemoteConsole(token,skipIntro=false){
  if(token!==session)return;
+ saveTerminalUnlock();
+ updateBearAccess();
  const screen=document.createElement("section");
  screen.id="remoteConsole";
  screen.className="remote-console";
@@ -103,6 +112,7 @@ function openRemoteConsole(token){
  screen.innerHTML='<pre class="remote-logs" id="remoteLogs"></pre><div class="remote-directory" id="remoteDirectory" hidden></div>';
  document.body.appendChild(screen);
  requestAnimationFrame(()=>screen.classList.add("visible"));
+ if(skipIntro){showRemoteDirectory(screen,token);return;}
  const log=document.getElementById("remoteLogs");
  const verbs=["init","exec","mount","read","write","verify","scan","bind","resolve","connect","sync","load","decode","handshake","route","open"];
  const paths=["/sys/core","/dev/tty0","/proc/session","/var/remote","/mnt/bridge","/usr/local/bin","/net/relay","/etc/runtime"];
@@ -123,9 +133,15 @@ function openRemoteConsole(token){
  setTimeout(()=>{
   if(token!==session||!screen.isConnected)return;
   clearInterval(burst);
-  screen.classList.add("remote-cut");
-  setTimeout(()=>{
-   if(token!==session||!screen.isConnected)return;
+  showRemoteDirectory(screen,token);
+ },4300);
+}
+
+function showRemoteDirectory(screen,token){
+ if(token!==session||!screen.isConnected)return;
+ screen.classList.add("remote-cut");
+ setTimeout(()=>{
+  if(token!==session||!screen.isConnected)return;
    const directory=document.getElementById("remoteDirectory");
    directory.hidden=false;
    screen.classList.add("remote-directory-open");
@@ -155,6 +171,5 @@ function openRemoteConsole(token){
     prompt.textContent="\n5 entries found.\n\nC:\\\\ARCHIVE> _";
     directory.appendChild(prompt);
    },1400);
-  },450);
- },4300);
+ },450);
 }
