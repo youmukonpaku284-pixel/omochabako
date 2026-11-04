@@ -7,8 +7,8 @@ let intervalMisses=0,secretPossible=true;
 const PATCH_KEY="omochabako_patch_v1";
 const patchActive=()=>{try{return localStorage.getItem(PATCH_KEY)==="1";}catch{return false;}};
 let anomalySeen=false;
-// After 3 hits: exactly 2 misses before hit 4; after 8 hits: exactly 4 before hit 9.
-const SECRET_MISSES={3:2,8:4};
+// After hit 1: exactly 4 misses before hit 2; after hit 4: exactly 3 misses before hit 5.
+const SECRET_MISSES={1:4,4:3};
 const random=(a,b)=>Math.random()*(b-a)+a;
 function update(){ $("remaining").textContent=TOTAL-round;$("misses").textContent=misses;$("average").textContent=times.length?Math.round(times.reduce((a,b)=>a+b,0)/times.length):"—";}
 function begin(){session++;clearTimeout(waiting);times=[];misses=0;round=0;intervalMisses=0;secretPossible=true;anomalySeen=false;active=false;started=true;target.hidden=true;message.hidden=true;message.style.display="none";result.hidden=true;pop.hidden=true;update();schedule(session);}
