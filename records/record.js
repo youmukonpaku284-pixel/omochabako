@@ -13,7 +13,7 @@ button.addEventListener("click",()=>{
  }
  button.textContent="READING... / 読み込み中...";
  setTimeout(()=>{
-  image.src="corrupted.svg";
+  image.src="corrupted.png";
   image.alt="赤黒く破損したクレヨン画";
   page.classList.add("broken");
  },1500);
