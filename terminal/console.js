@@ -64,14 +64,16 @@ function showRemoteDirectory(){
    const key=(cwd==="C:\\"?cwd:cwd+"\\")+arg;
    print(documents[key]||"FILE NOT FOUND / ファイルが見つかりません。");return;
   }
-  if(cmd==="STATUS"){let patched=false;try{patched=localStorage.getItem("omochabako_patch_v1")==="1";}catch{}print("SESSION: ACTIVE / セッション：稼働中\nACCESS: LIMITED / 権限：制限あり\nINTERFACE: LOCAL / 接続：ローカル\nPATCH: "+(patched?"APPLIED / 適用済み":"NONE / 未適用"));return;}
+  if(cmd==="STATUS"){let patched=false;try{patched=localStorage.getItem("omochabako_patch_v1")==="1";}catch{}print("SESSION: ACTIVE / セッション：稼働中\nACCESS LEVEL: "+(window.OmoAccess?OmoAccess.getLevel():0)+" / 管理権限\nINTERFACE: LOCAL / 接続：ローカル\nPATCH: "+(patched?"APPLIED / 適用済み":"NONE / 未適用"));return;}
   if(cmd==="PATCH"){try{localStorage.setItem("omochabako_patch_v1","1");}catch{}print("PATCH APPLIED / 変更を適用しました。\nRESTART REQUIRED / 反映には再起動が必要です。");return;}
+  if(cmd==="DEVLEVEL"){if(!/^[0-4]$/.test(arg)){print("USAGE: DEVLEVEL [0-4] / テスト用権限を指定してください。");return;}print("ACCESS LEVEL: "+OmoAccess.setLevel(Number(arg))+" / テスト用権限を変更しました。");return;}
   if(cmd==="RESET"&&arg==="PATCH"){try{localStorage.removeItem("omochabako_patch_v1");}catch{}print("PATCH RESET / 変更を解除しました。\nRESTART REQUIRED / 反映には再起動が必要です。");return;}
   if(cmd==="RESTART"){window.location.href="../";return;}
   if(cmd==="CONNECT"){
    if(!arg){print("USAGE: CONNECT [DESTINATION] / 接続先を指定してください。");return;}
    if(arg==="GAME"||arg==="TOYBOX"){navigate("../");return;}
    if(arg==="ARCHIVE"){navigate("archive.html");return;}
+   if(arg==="RECORD_001"||arg==="RECORD001"){navigate("../records/001.html");return;}
    print("DESTINATION NOT FOUND / 接続先が見つかりません。");return;
   }
   print("UNKNOWN COMMAND / 不明なコマンドです。");
