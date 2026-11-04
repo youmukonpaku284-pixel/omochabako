@@ -16,8 +16,9 @@ button.addEventListener("click",()=>{
   image.src="corrupted.svg";
   image.alt="赤黒く破損したクレヨン画";
   page.classList.add("broken");
- },850);
- setTimeout(()=>{content.hidden=true;warning.hidden=false;warning.textContent="くるべきじゃない";},1500);
- setTimeout(()=>{blackout.hidden=false;},3000);
- setTimeout(()=>{window.location.replace("../");},3900);
+ },1500);
+ setTimeout(()=>{content.classList.add("erasing");},4000);
+ setTimeout(()=>{content.hidden=true;warning.hidden=false;warning.textContent="くるべきじゃない";},6000);
+ setTimeout(()=>{blackout.hidden=false;},10000);
+ setTimeout(()=>{window.location.replace("../");},12000);
 });
