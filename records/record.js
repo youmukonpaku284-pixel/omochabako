@@ -5,6 +5,10 @@ const page=document.querySelector(".record");
 const content=document.getElementById("recordContent");
 const warning=document.getElementById("warning");
 const blackout=document.getElementById("blackout");
+// Preload the alternate artwork before the reveal so the shake and swap appear together.
+const corruptedArtwork=new Image();
+corruptedArtwork.src="corrupted.png";
+const artworkReady=corruptedArtwork.decode?corruptedArtwork.decode().catch(()=>{}):Promise.resolve();
 button.addEventListener("click",()=>{
  button.disabled=true;
  if(window.OmoAccess&&OmoAccess.canAccess(1)){
@@ -12,8 +16,9 @@ button.addEventListener("click",()=>{
   return;
  }
  button.textContent="READING... / 読み込み中...";
- setTimeout(()=>{
-  image.src="corrupted.png";
+ setTimeout(async()=>{
+  await artworkReady;
+  image.src=corruptedArtwork.src;
   image.alt="赤黒く破損したクレヨン画";
   page.classList.add("broken");
  },800);
